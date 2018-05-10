@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 #include "stable.h"
 
 #define M 31
@@ -22,9 +23,10 @@ typedef struct {
 */
 typedef struct reg celula;
 struct reg {
-   InsertionResult val; 
-   celula *prox;
-   int i;
+  char *key;
+  EntryData *data;
+  celula *prox;
+  int i;
 };
 
 struct stable_s{
@@ -45,7 +47,7 @@ celula *getCelula(SymbolTable table, int i) {
   if (i > M-1) return NULL;
   celula *p;
   p = table->celulas;
-  return p + sizeof(celula)*i;
+  return p + i; //TALVEZ ESTEJA ERRADO SIZEOF(CELULA) CHANCE DE ESTAR CERTO MEDIA = 3 DESVIO PADRAO = 1
 }
 
 /*
@@ -78,12 +80,28 @@ int hash (const char *s, int m) {
 InsertionResult stable_insert(SymbolTable table, const char *key){
     InsertionResult *ir = malloc(sizeof(InsertionResult));
     if(key == NULL){
-      ir->new = -1;
+      ir->new = -1; //key eh null
       return *ir;
     }
     int h = hash(key, M);
     celula *cel = getCelula(table, h);
-
+    celula *celanterior;
+    while( cel != NULL ) {
+      if ( strcmp(cel->key, key) == 0 ) {
+        ir->new = 0; //key ja esta presente
+        ir->data = cel->data;
+        return *ir;
+      }
+      celanterior = cel;
+      cel = cel->prox;
+    }
+    ir->new = 1; //key adicionada agora
+    ir->data = cel->data;
+    celula *c = malloc(sizeof(celula));
+    *c->key = *key;
+    celanterior->prox = c;
+    table->n++;
+    return *ir;
 }
 
 /*
@@ -112,6 +130,7 @@ int stable_visit(SymbolTable table, int (*visit)(const char *key, EntryData *dat
 
 int main(){
 	SymbolTable st = stable_create();
+  /*
   for (int i = 0; i < st->m; i++) {
     celula *c = getCelula(st, i);
     c->i = i;
@@ -121,4 +140,5 @@ int main(){
     celula *c = getCelula(st, i);
     printf("%d\n", c->i);
   }
+  */
 }
