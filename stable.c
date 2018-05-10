@@ -24,6 +24,7 @@ typedef struct reg celula;
 struct reg {
    InsertionResult val; 
    celula *prox;
+   int i;
 };
 
 struct stable_s{
@@ -111,4 +112,13 @@ int stable_visit(SymbolTable table, int (*visit)(const char *key, EntryData *dat
 
 int main(){
 	SymbolTable st = stable_create();
+  for (int i = 0; i < st->m; i++) {
+    celula *c = getCelula(st, i);
+    c->i = i;
+  }
+  celula *c = getCelula(st, 10);
+  for (int i = 0; i < st->m; i++) {
+    celula *c = getCelula(st, i);
+    printf("%d\n", c->i);
+  }
 }
