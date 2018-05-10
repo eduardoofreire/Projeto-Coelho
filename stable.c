@@ -47,7 +47,7 @@ celula *getCelula(SymbolTable table, int i) {
   if (i > M-1) return NULL;
   celula *p;
   p = table->celulas;
-  return p + i; //TALVEZ ESTEJA ERRADO SIZEOF(CELULA) CHANCE DE ESTAR CERTO MEDIA = 3 DESVIO PADRAO = 1
+  return p + i*(sizeof(celula)); //TALVEZ ESTEJA ERRADO SIZEOF(CELULA) CHANCE DE ESTAR CERTO MEDIA = 3 DESVIO PADRAO = 1
 }
 
 /*
@@ -129,8 +129,10 @@ int stable_visit(SymbolTable table, int (*visit)(const char *key, EntryData *dat
 }
 
 int main(){
+  
+
 	SymbolTable st = stable_create();
-  /*
+  
   for (int i = 0; i < st->m; i++) {
     celula *c = getCelula(st, i);
     c->i = i;
@@ -140,5 +142,10 @@ int main(){
     celula *c = getCelula(st, i);
     printf("%d\n", c->i);
   }
-  */
+  
+  char *c2;
+  c2 = "ahoo";
+  int a = 100;
+  InsertionResult *ir = stable_insert(st,c2);
+  ir->data = a;
 }
