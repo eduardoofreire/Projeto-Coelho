@@ -23,10 +23,11 @@ typedef struct {
 */
 typedef struct reg celula;
 struct reg {
-  char *key;
+  const char *key;
   EntryData *data;
   celula *prox;
   int i;
+  int n;
 };
 
 struct stable_s{
@@ -41,7 +42,8 @@ SymbolTable stable_create(){
   st->m = M;
   st->celulas = malloc(sizeof(celula)*st->m);
   st->n = 0;
-};
+  return st;
+}
 
 celula *getCelula(SymbolTable table, int i) {
   if (i > M-1) return NULL;
@@ -86,8 +88,8 @@ InsertionResult stable_insert(SymbolTable table, const char *key){
     int h = hash(key, M);
     celula *cel = getCelula(table, h);
     celula *celanterior;
-    while( cel != NULL ) {
-      if ( strcmp(cel->key, key) == 0 ) {
+    while(table->n > 0 && cel != NULL ) {
+      if (strcmp(cel->key, key) == 0 ) {
         ir->new = 0; //key ja esta presente
         ir->data = cel->data;
         return *ir;
@@ -96,10 +98,11 @@ InsertionResult stable_insert(SymbolTable table, const char *key){
       cel = cel->prox;
     }
     ir->new = 1; //key adicionada agora
-    ir->data = cel->data;
+    ir->data = malloc(sizeof(EntryData));
+    ir->data->i = 2;
     celula *c = malloc(sizeof(celula));
-    *c->key = *key;
-    celanterior->prox = c;
+    c->key = key;
+    if(cel->n != 0)  celanterior->prox = c;
     table->n++;
     return *ir;
 }
@@ -110,11 +113,11 @@ InsertionResult stable_insert(SymbolTable table, const char *key){
   Given a key, returns a pointer to the data associated with it, or a
   NULL pointer if the key is not found.
 */
-EntryData *stable_find(SymbolTable table, const char *key){
+/*EntryData *stable_find(SymbolTable table, const char *key){
 
 }
 
-/*
+
   Visit each entry on the table.
 
   The visit function is called on each entry, with pointers to its key
@@ -123,16 +126,16 @@ EntryData *stable_find(SymbolTable table, const char *key){
 
   Returns zero if the iteration was stopped by the visit function,
   nonzero otherwise.
-*/
+
 int stable_visit(SymbolTable table, int (*visit)(const char *key, EntryData *data)){
 
-}
+}*/
 
 int main(){
   
 
 	SymbolTable st = stable_create();
-  
+  /*
   for (int i = 0; i < st->m; i++) {
     celula *c = getCelula(st, i);
     c->i = i;
@@ -141,11 +144,13 @@ int main(){
   for (int i = 0; i < st->m; i++) {
     celula *c = getCelula(st, i);
     printf("%d\n", c->i);
-  }
+  }*/
   
-  char *c2;
-  c2 = "ahoo";
+  const char *c2;
+  c2 = "cama";
   int a = 100;
-  InsertionResult *ir = stable_insert(st,c2);
-  ir->data = a;
+  InsertionResult ir = stable_insert(st,c2);
+  printf("%d %d\n", ir.new, ir.data->i);
+  ir.data->i = 3;
+  printf("%d %d\n", ir.new, ir.data->i);
 }
