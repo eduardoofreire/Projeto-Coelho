@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include "stable.h"
 
 #define M 31
-#define data (insResu->data)
+#define amax 10
+//#define data (insResu->data)
 
 /*
 typedef union {
@@ -18,22 +20,33 @@ typedef struct {
   EntryData *data;  // Data associated with entry.
 } InsertionResult;
 */
-typedef struc reg celula;
+typedef struct reg celula;
 struct reg {
    InsertionResult val; 
    celula *prox;
-}
+};
 
 struct stable_s{
-  celula inicio;
-  int n;
-}
+	int n;
+	int m;
+  celula *celulas;
+  //double a = m/n
+};
 
 SymbolTable stable_create(){
   SymbolTable st = malloc(sizeof(SymbolTable));
-  st->inicio = null;
+  st->m = M;
+  st->celulas = malloc(sizeof(celula)*st->m);
   st->n = 0;
+};
+
+celula *getCelula(SymbolTable table, int i) {
+  if (i > M-1) return NULL;
+  celula *p;
+  p = table->celulas;
+  return p + sizeof(celula)*i;
 }
+
 /*
   Destroy a given symbol table.
 */
@@ -41,12 +54,11 @@ void stable_destroy(SymbolTable table){
   free(table);
 }
 
-typedef char *string;
 
-unsigned convert (string s) {
+int hash (const char *s, int m) {
    unsigned h = 0;
    for (int i = 0; s[i] != '\0'; i++) 
-      h = h * 256 + s[i];
+      h = (h * 256 + s[i]) % m;
    return h;
 }
 
@@ -63,22 +75,14 @@ unsigned convert (string s) {
 */
 
 InsertionResult stable_insert(SymbolTable table, const char *key){
-  InsertionResult insResu = malloc(sizeof(InsertionResult));
-  int h = table.lookup(key); //this method returns 0 (zero) if the symbol does not exist in the symbol table (TutorialsPoint)
-  if(h != 0){  //the symbol exists!
-    insResu->new = 0;
-    EntryData entry = malloc(sizeof(EntryData));
-    entry->str = key;
-    insResu->data = entry;
-    /*data = malloc(sizeof(EntryData));
-    data->str = key;*/
-  }else{
-    insResu->new = -1;
-    EntryData entry = malloc(sizeof(EntryData));
-    entry->str = key;
-    insResu->data = entry;
-  }
-  return insResu;
+    InsertionResult *ir = malloc(sizeof(InsertionResult));
+    if(key == NULL){
+      ir->new = -1;
+      return *ir;
+    }
+    int h = hash(key, M);
+    celula *cel = getCelula(table, h);
+
 }
 
 /*
@@ -106,5 +110,5 @@ int stable_visit(SymbolTable table, int (*visit)(const char *key, EntryData *dat
 }
 
 int main(){
-
+	SymbolTable st = stable_create();
 }
