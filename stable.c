@@ -49,7 +49,7 @@ celula *getCelula(SymbolTable table, int i) {
   if (i > M-1) return NULL;
   celula *p;
   p = table->celulas;
-  return p + i*(sizeof(celula)); //TALVEZ ESTEJA ERRADO SIZEOF(CELULA) CHANCE DE ESTAR CERTO MEDIA = 3 DESVIO PADRAO = 1
+  return p + i;
 }
 
 /*
@@ -81,28 +81,28 @@ int hash (const char *s, int m) {
 
 InsertionResult stable_insert(SymbolTable table, const char *key){
     InsertionResult *ir = malloc(sizeof(InsertionResult));
-    if(key == NULL){
-      ir->new = -1; //key eh null
-      return *ir;
-    }
     int h = hash(key, M);
     celula *cel = getCelula(table, h);
-    celula *celanterior;
-    while(table->n > 0 && cel != NULL ) {
-      if (strcmp(cel->key, key) == 0 ) {
-        ir->new = 0; //key ja esta presente
+
+    while ( cel->key != NULL ) {
+      if (strcmp(cel->key,key)==0) {
+        ir->new = 0;
         ir->data = cel->data;
         return *ir;
       }
-      celanterior = cel;
+      if (cel->prox == NULL) cel->prox = malloc(sizeof(celula));
       cel = cel->prox;
     }
-    ir->new = 1; //key adicionada agora
-    ir->data = malloc(sizeof(EntryData));
-    ir->data->i = 2;
-    celula *c = malloc(sizeof(celula));
+    //Cria celula
+    celula *c = malloc(sizeof(celula)); //Celula auxiliar
+    c->data = malloc(sizeof(EntryData));
     c->key = key;
-    if(cel->n != 0)  celanterior->prox = c;
+    *cel = *c; //copia para celula
+    free(c); //Apaga celula auxiliar
+    //Set IR
+    ir->new = 1;
+    ir->data = cel->data;
+
     table->n++;
     return *ir;
 }
@@ -113,11 +113,24 @@ InsertionResult stable_insert(SymbolTable table, const char *key){
   Given a key, returns a pointer to the data associated with it, or a
   NULL pointer if the key is not found.
 */
-/*EntryData *stable_find(SymbolTable table, const char *key){
-
+EntryData *stable_find(SymbolTable table, const char *key){
+  EntryData *ed;
+  int h = hash(key, M);
+  celula *cel = getCelula(table, h);
+  while ( cel->key != NULL ) {
+    if (strcmp(cel->key,key)==0) {
+      ed = cel->data;
+      return ed;
+    }
+    cel = cel->prox;
+    if (cel == NULL) break;
+  }
+  ed = malloc(sizeof(EntryData));
+  ed = NULL;
+  return ed;
 }
 
-
+/*
   Visit each entry on the table.
 
   The visit function is called on each entry, with pointers to its key
@@ -126,10 +139,27 @@ InsertionResult stable_insert(SymbolTable table, const char *key){
 
   Returns zero if the iteration was stopped by the visit function,
   nonzero otherwise.
-
+*/
+/*
 int stable_visit(SymbolTable table, int (*visit)(const char *key, EntryData *data)){
 
-}*/
+}
+*/
+
+
+void print(SymbolTable st) {
+  celula *cel;
+  printf("Entries: %d\n", st->n);
+  for (int i = 0; i < M; i++) {
+    cel = getCelula(st,i);
+    printf("%d: ", i);
+    while(cel!=NULL) {
+      printf("(%s,%d) ", cel->key, cel->data->i);
+      cel = cel->prox;
+    }
+    printf("\n");
+  }
+}
 
 int main(){
   
@@ -145,12 +175,29 @@ int main(){
     celula *c = getCelula(st, i);
     printf("%d\n", c->i);
   }*/
-  
-  const char *c2;
-  c2 = "cama";
-  int a = 100;
-  InsertionResult ir = stable_insert(st,c2);
-  printf("%d %d\n", ir.new, ir.data->i);
-  ir.data->i = 3;
-  printf("%d %d\n", ir.new, ir.data->i);
+
+  for (int i = 0; i < 90; ++i) {
+    char *c = malloc(sizeof(char));
+    *c = 33 + i;
+    //printf("%s %d %d \n", c , i, hash(c,M));
+    InsertionResult ir = stable_insert(st,c);
+    ir.data->i = i;
+  }
+
+  celula *cel;
+  //printf("\n");
+  /*
+  cel = getCelula(st,10);
+  printf("%s %d\n", cel->key, cel->data->i);
+  cel = getCelula(st,24);
+  printf("%s %d\n", cel->key, cel->data->i);
+
+  InsertionResult ir = stable_insert(st,cel->key);
+  ir.data->i = 645;
+  */
+  InsertionResult ir = stable_insert(st,"projetochato");
+  ir.data->i = 10;
+  EntryData *ed = stable_find(st,"projetochato");
+  ed->i = 999999;
+  print(st);
 }
