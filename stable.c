@@ -140,11 +140,30 @@ EntryData *stable_find(SymbolTable table, const char *key){
   Returns zero if the iteration was stopped by the visit function,
   nonzero otherwise.
 */
-/*
-int stable_visit(SymbolTable table, int (*visit)(const char *key, EntryData *data)){
-
+/*int visit(const char *key, EntryData *data){
+	celula *cel;
+	char *words = malloc(st->n * sizeof(char));
+	int i = 0;
+	while(cel!=NULL) {
+		words[i++] = cel
+      	cel = cel->prox;
+    }
+    qsort(print, n, sizeof(char), cmpfunc);
 }
-*/
+
+int stable_visit(SymbolTable table, int (*visit)(const char *key, EntryData *data)){
+	celula *cel;
+	char *words = malloc(table->n * sizeof(char));
+	for (int i = 0; i < table->n; i++) {
+	    cel = getCelula(st,0);
+	    while(cel!=NULL) {
+	      printf("(%s,%d) ", cel->key, cel->data->i);
+	      cel = cel->prox;
+	    }
+		printf("\n");
+	}
+	return visit(key, data);
+}*/
 
 
 void print(SymbolTable st) {
@@ -179,7 +198,7 @@ int main(){
   for (int i = 0; i < 90; ++i) {
     char *c = malloc(sizeof(char));
     *c = 33 + i;
-    //printf("%s %d %d \n", c , i, hash(c,M));
+    printf("%s %d %d \n", c , i, hash(c,M));
     InsertionResult ir = stable_insert(st,c);
     ir.data->i = i;
   }
@@ -195,9 +214,9 @@ int main(){
   InsertionResult ir = stable_insert(st,cel->key);
   ir.data->i = 645;
   */
-  InsertionResult ir = stable_insert(st,"projetochato");
+  /*InsertionResult ir = stable_insert(st,"projetochato");
   ir.data->i = 10;
   EntryData *ed = stable_find(st,"projetochato");
   ed->i = 999999;
-  print(st);
+  print(st);*/
 }
