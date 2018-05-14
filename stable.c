@@ -48,8 +48,10 @@ SymbolTable stable_create(){
 celula *getCelula(SymbolTable table, int i) {
   if (i > M-1) return NULL;
   celula *p;
-  p = table->celulas;
-  return p + i;
+  p = table->celulas; 
+  if((p+i) != NULL)
+    return p + i;
+  return NULL;
 }
 
 /*
@@ -88,6 +90,7 @@ InsertionResult stable_insert(SymbolTable table, const char *key){
       if (strcmp(cel->key,key)==0) {
         ir->new = 0;
         ir->data = cel->data;
+	cel->n++;
         return *ir;
       }
       if (cel->prox == NULL) cel->prox = malloc(sizeof(celula));
@@ -96,7 +99,9 @@ InsertionResult stable_insert(SymbolTable table, const char *key){
     //Cria celula
     celula *c = malloc(sizeof(celula)); //Celula auxiliar
     c->data = malloc(sizeof(EntryData));
-    c->key = key;
+    c->key = strdup(key);
+    //printf("\n INSERINDO %s COMO %s\n", key, c->key);
+    c->n = 1;
     *cel = *c; //copia para celula
     free(c); //Apaga celula auxiliar
     //Set IR
@@ -140,30 +145,11 @@ EntryData *stable_find(SymbolTable table, const char *key){
   Returns zero if the iteration was stopped by the visit function,
   nonzero otherwise.
 */
-/*int visit(const char *key, EntryData *data){
-	celula *cel;
-	char *words = malloc(st->n * sizeof(char));
-	int i = 0;
-	while(cel!=NULL) {
-		words[i++] = cel
-      	cel = cel->prox;
-    }
-    qsort(print, n, sizeof(char), cmpfunc);
-}
-
+/*
 int stable_visit(SymbolTable table, int (*visit)(const char *key, EntryData *data)){
-	celula *cel;
-	char *words = malloc(table->n * sizeof(char));
-	for (int i = 0; i < table->n; i++) {
-	    cel = getCelula(st,0);
-	    while(cel!=NULL) {
-	      printf("(%s,%d) ", cel->key, cel->data->i);
-	      cel = cel->prox;
-	    }
-		printf("\n");
-	}
-	return visit(key, data);
-}*/
+
+}
+*/
 
 
 void print(SymbolTable st) {
@@ -172,18 +158,21 @@ void print(SymbolTable st) {
   for (int i = 0; i < M; i++) {
     cel = getCelula(st,i);
     printf("%d: ", i);
+    if(cel != NULL)
     while(cel!=NULL) {
-      printf("(%s,%d) ", cel->key, cel->data->i);
+       printf("(%s,%d) ", cel->key, cel->data->i);
       cel = cel->prox;
     }
+    
     printf("\n");
   }
 }
 
-int main(){
+/*
+ int main(){
   
 
-	SymbolTable st = stable_create();
+  SymbolTable st = stable_create();
   /*
   for (int i = 0; i < st->m; i++) {
     celula *c = getCelula(st, i);
@@ -193,15 +182,16 @@ int main(){
   for (int i = 0; i < st->m; i++) {
     celula *c = getCelula(st, i);
     printf("%d\n", c->i);
-  }*/
-
-  for (int i = 0; i < 90; ++i) {
+  }
+ 
+  for (int i = 0; i < 30; ++i) {
     char *c = malloc(sizeof(char));
     *c = 33 + i;
-    printf("%s %d %d \n", c , i, hash(c,M));
+    //printf("%s %d %d \n", c , i, hash(c,M));
     InsertionResult ir = stable_insert(st,c);
     ir.data->i = i;
   }
+ 
 
   celula *cel;
   //printf("\n");
@@ -213,10 +203,13 @@ int main(){
 
   InsertionResult ir = stable_insert(st,cel->key);
   ir.data->i = 645;
-  */
-  /*InsertionResult ir = stable_insert(st,"projetochato");
+  
+  InsertionResult ir = stable_insert(st,"projetochato");
   ir.data->i = 10;
   EntryData *ed = stable_find(st,"projetochato");
   ed->i = 999999;
-  print(st);*/
-}
+   print(st);
+  InsertionResult ir3 = stable_insert(st,"projetochato");
+  // printf("\n ---+---- %d", ir3.new);
+  */
+
